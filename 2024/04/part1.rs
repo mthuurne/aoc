@@ -61,29 +61,27 @@ fn scan_vertical(width: usize, height: usize) -> Box<dyn Iterator<Item=Box<GridS
 }
 
 fn scan_diag_backslash(width: usize, height: usize) -> Box<dyn Iterator<Item=Box<GridScan>>> {
-    let mut output: Vec<Box<GridScan>> = Vec::new();
-    for x in 0..width {
-        let num_steps = cmp::min(width - x, height);
-        output.push(Box::new(GridScan { start: (x, 0), end: (x + num_steps, num_steps), step: (1, 1) }));
-    }
-    for y in 1..height {
-        let num_steps = cmp::min(width, height - y);
-        output.push(Box::new(GridScan { start: (0, y), end: (num_steps, y + num_steps), step: (1, 1) }));
-    }
-    Box::new(output.into_iter())
+    Box::new(
+        (0..width).map(move |x| {
+            let num_steps = cmp::min(width - x, height);
+            Box::new(GridScan { start: (x, 0), end: (x + num_steps, num_steps), step: (1, 1) })
+        }).chain((1..height).map(move |y| {
+            let num_steps = cmp::min(width, height - y);
+            Box::new(GridScan { start: (0, y), end: (num_steps, y + num_steps), step: (1, 1) })
+        }))
+    )
 }
 
 fn scan_diag_slash(width: usize, height: usize) -> Box<dyn Iterator<Item=Box<GridScan>>> {
-    let mut output: Vec<Box<GridScan>> = Vec::new();
-    for x in 0..width {
-        let num_steps = cmp::min(width - x, height);
-        output.push(Box::new(GridScan { start: (x, height - 1), end: (x + num_steps, (height - 1).wrapping_sub(num_steps)), step: (1, -1) }));
-    }
-    for y in 0..height - 1 {
-        let num_steps = cmp::min(width, y + 1);
-        output.push(Box::new(GridScan { start: (0, y), end: (num_steps, y.wrapping_sub(num_steps)), step: (1, -1) }));
-    }
-    Box::new(output.into_iter())
+    Box::new(
+        (0..width).map(move |x| {
+            let num_steps = cmp::min(width - x, height);
+            Box::new(GridScan { start: (x, height - 1), end: (x + num_steps, (height - 1).wrapping_sub(num_steps)), step: (1, -1) })
+        }).chain((0..height - 1).map(move |y| {
+            let num_steps = cmp::min(width, y + 1);
+            Box::new(GridScan { start: (0, y), end: (num_steps, y.wrapping_sub(num_steps)), step: (1, -1) })
+        }))
+    )
 }
 
 fn bidirectional(scanners: Box<dyn Iterator<Item=Box<GridScan>>>) -> Vec<Box<dyn Iterator<Item=(usize, usize)>>> {
@@ -95,16 +93,17 @@ fn bidirectional(scanners: Box<dyn Iterator<Item=Box<GridScan>>>) -> Vec<Box<dyn
     output
 }
 
-fn scan_grid(width: usize, height: usize) -> Vec<Box<dyn Iterator<Item=(usize, usize)>>> {
-    let scanners = [
-        scan_horizontal,
-        scan_vertical,
-        scan_diag_backslash,
-        scan_diag_slash,
-    ];
-    scanners.iter().flat_map(|scanner|
+const SCANNERS: [fn(usize, usize) -> Box<dyn Iterator<Item=Box<GridScan>>>; 4] = [
+    scan_horizontal,
+    scan_vertical,
+    scan_diag_backslash,
+    scan_diag_slash,
+];
+
+fn scan_grid(width: usize, height: usize) -> impl Iterator<Item=Box<dyn Iterator<Item=(usize, usize)>>> {
+    SCANNERS.iter().flat_map(move |scanner|
         bidirectional(scanner(width, height))
-    ).collect()
+    )
 }
 
 fn solve(grid: &Vec<String>) {
