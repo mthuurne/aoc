@@ -14,10 +14,9 @@ fn solve(program: &String) {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    for arg in &args[1..] {
+    for arg in env::args().skip(1) {
         println!("=== {arg}");
-        let data = read_input(Path::new(arg)).expect("reading input");
+        let data = read_input(Path::new(&arg)).expect("reading input");
         solve(&data);
     }
 }
