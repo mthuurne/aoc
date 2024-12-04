@@ -1,0 +1,23 @@
+[package]
+name = "aoc2024"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+itertools = "0.13.0"
+
+[[bin]]
+name = "day01-part1"
+path = "01/part1.rs"
+
+[[bin]]
+name = "day01-part2"
+path = "01/part2.rs"
+
+[[bin]]
+name = "day02-part1"
+path = "02/part1.rs"
+
+[[bin]]
+name = "day02-part2"
+path = "02/part2.rs"
