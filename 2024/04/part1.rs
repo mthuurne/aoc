@@ -82,13 +82,14 @@ impl GridScan {
     }
 }
 
-fn bidirectional(scanners: Box<dyn Iterator<Item=GridScan>>) -> Vec<Box<dyn Iterator<Item=(usize, usize)>>> {
-    let mut output: Vec<Box<dyn Iterator<Item=(usize, usize)>>> = Vec::new();
-    for scanner in scanners {
-        output.push(Box::new(scanner.clone()));
-        output.push(Box::new(scanner.clone().rev()));
-    }
-    output
+fn bidirectional(scanners: impl Iterator<Item=GridScan>) -> impl Iterator<Item=Box<dyn Iterator<Item=(usize, usize)>>> {
+    scanners.flat_map(|scanner| {
+        let dirs: [Box<dyn Iterator<Item=(usize, usize)>>; 2] = [
+            Box::new(scanner.clone()),
+            Box::new(scanner.rev()),
+        ];
+        dirs.into_iter()
+    })
 }
 
 const SCANNERS: [fn(usize, usize) -> Box<dyn Iterator<Item=GridScan>>; 4] = [
