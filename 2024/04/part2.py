@@ -27,11 +27,6 @@ def bidirectional(scanner):
         yield reversed(coords)
 
 
-def scan_grid(width, height):
-    yield from bidirectional(scan_diag_backslash(width, height))
-    yield from bidirectional(scan_diag_slash(width, height))
-
-
 def find_centers(data, scanner):
     centers = set()
     for scan in scanner:
