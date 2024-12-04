@@ -49,40 +49,40 @@ impl DoubleEndedIterator for GridScan {
 }
 
 impl GridScan {
-    fn horizontal(width: usize, height: usize) -> impl Iterator<Item=Box<GridScan>> {
+    fn horizontal(width: usize, height: usize) -> impl Iterator<Item=GridScan> {
         (0..height).map(move |y|
-            Box::new(GridScan { start: (0, y), end: (width, y), step: (1, 0) })
+            GridScan { start: (0, y), end: (width, y), step: (1, 0) }
         )
     }
 
-    fn vertical(width: usize, height: usize) -> impl Iterator<Item=Box<GridScan>> {
+    fn vertical(width: usize, height: usize) -> impl Iterator<Item=GridScan> {
         (0..width).map(move |x|
-            Box::new(GridScan { start: (x, 0), end: (x, height), step: (0, 1) })
+            GridScan { start: (x, 0), end: (x, height), step: (0, 1) }
         )
     }
 
-    fn backslash(width: usize, height: usize) -> impl Iterator<Item=Box<GridScan>> {
+    fn backslash(width: usize, height: usize) -> impl Iterator<Item=GridScan> {
         (0..width).map(move |x| {
             let num_steps = cmp::min(width - x, height);
-            Box::new(GridScan { start: (x, 0), end: (x + num_steps, num_steps), step: (1, 1) })
+            GridScan { start: (x, 0), end: (x + num_steps, num_steps), step: (1, 1) }
         }).chain((1..height).map(move |y| {
             let num_steps = cmp::min(width, height - y);
-            Box::new(GridScan { start: (0, y), end: (num_steps, y + num_steps), step: (1, 1) })
+            GridScan { start: (0, y), end: (num_steps, y + num_steps), step: (1, 1) }
         }))
     }
 
-    fn slash(width: usize, height: usize) -> impl Iterator<Item=Box<GridScan>> {
+    fn slash(width: usize, height: usize) -> impl Iterator<Item=GridScan> {
         (0..width).map(move |x| {
             let num_steps = cmp::min(width - x, height);
-            Box::new(GridScan { start: (x, height - 1), end: (x + num_steps, (height - 1).wrapping_sub(num_steps)), step: (1, -1) })
+            GridScan { start: (x, height - 1), end: (x + num_steps, (height - 1).wrapping_sub(num_steps)), step: (1, -1) }
         }).chain((0..height - 1).map(move |y| {
             let num_steps = cmp::min(width, y + 1);
-            Box::new(GridScan { start: (0, y), end: (num_steps, y.wrapping_sub(num_steps)), step: (1, -1) })
+            GridScan { start: (0, y), end: (num_steps, y.wrapping_sub(num_steps)), step: (1, -1) }
         }))
     }
 }
 
-fn bidirectional(scanners: Box<dyn Iterator<Item=Box<GridScan>>>) -> Vec<Box<dyn Iterator<Item=(usize, usize)>>> {
+fn bidirectional(scanners: Box<dyn Iterator<Item=GridScan>>) -> Vec<Box<dyn Iterator<Item=(usize, usize)>>> {
     let mut output: Vec<Box<dyn Iterator<Item=(usize, usize)>>> = Vec::new();
     for scanner in scanners {
         output.push(Box::new(scanner.clone()));
@@ -91,7 +91,7 @@ fn bidirectional(scanners: Box<dyn Iterator<Item=Box<GridScan>>>) -> Vec<Box<dyn
     output
 }
 
-const SCANNERS: [fn(usize, usize) -> Box<dyn Iterator<Item=Box<GridScan>>>; 4] = [
+const SCANNERS: [fn(usize, usize) -> Box<dyn Iterator<Item=GridScan>>; 4] = [
     |w, h| Box::new(GridScan::horizontal(w, h)),
     |w, h| Box::new(GridScan::vertical(w, h)),
     |w, h| Box::new(GridScan::backslash(w, h)),
