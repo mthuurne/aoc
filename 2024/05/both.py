@@ -20,7 +20,8 @@ def read_input():
 
 
 def solve(rules, books):
-    score = 0
+    score1 = 0
+    score2 = 0
     for book in books:
         # Use the fact that the input compares every page combination.
         freqs = {page: 0 for page in book}
@@ -30,13 +31,16 @@ def solve(rules, books):
         correct = tuple(sorted(freqs, key=freqs.__getitem__))
         print(book)
         print(correct)
+        middle = correct[len(book) // 2]
         if book == correct:
-            middle = book[len(book) // 2]
-            score += middle
             print("right order, middle page is", middle)
+            score1 += middle
         else:
-            print("wrong order")
-    print(f"{score=}")
+            print("wrong order, middle page should be", middle)
+            score2 += middle
+        print()
+    print(f"{score1=}")
+    print(f"{score2=}")
 
 
 if __name__ == "__main__":
