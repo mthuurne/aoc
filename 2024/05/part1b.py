@@ -26,8 +26,8 @@ def solve(rules, books):
         freqs = {page: 0 for page in book}
         for p1, p2 in rules:
             if p1 in freqs and p2 in freqs:
-                freqs[p1] += 1
-        correct = tuple(sorted(freqs, key=freqs.__getitem__, reverse=True))
+                freqs[p2] += 1
+        correct = tuple(sorted(freqs, key=freqs.__getitem__))
         print(book)
         print(correct)
         if book == correct:
