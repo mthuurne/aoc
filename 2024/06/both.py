@@ -20,8 +20,8 @@ def read_input():
 
 
 def solve(obstacles, start):
-    width = max(x + 1 for x, y in obstacles)
-    height = max(y + 1 for x, y in obstacles)
+    width = max(x for x, y in obstacles) + 1
+    height = max(y for x, y in obstacles) + 1
 
     def simulate(obstacles):
         """Return positions visited, or None if guard loops."""
