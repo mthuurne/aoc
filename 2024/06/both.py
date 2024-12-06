@@ -4,8 +4,12 @@ import fileinput
 def read_input():
     starts = set()
     obstacles = set()
+    height = 0
+    width = 0
     for y, line in enumerate(fileinput.input()):
+        height += 1
         for x, cell in enumerate(line.strip()):
+            width = max(width, x + 1)
             match cell:
                 case ".":
                     pass
@@ -16,12 +20,10 @@ def read_input():
                 case _:
                     assert False, cell
     start, = starts
-    return obstacles, start
+    return obstacles, start, width, height
 
 
-def solve(obstacles, start):
-    width = max(x for x, y in obstacles) + 1
-    height = max(y for x, y in obstacles) + 1
+def solve(obstacles, start, width, height):
 
     def simulate(obstacles):
         """Return positions visited, or None if guard loops."""
