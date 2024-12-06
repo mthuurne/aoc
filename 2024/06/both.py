@@ -25,22 +25,20 @@ def solve(obstacles, start):
 
     def simulate(obstacles):
         """Return positions visited, or None if guard loops."""
-        x, y = start
-        dx, dy = 0, -1
+        guard = (*start, 0, -1)
         visited = set()
-        while 0 <= x < width and 0 <= y < height:
-            guard = (x, y, dx, dy)
-            if guard in visited:
-                return None
+        while guard not in visited:
             visited.add(guard)
+            x, y, dx, dy = guard
             nx = x + dx
             ny = y + dy
             if (nx, ny) in obstacles:
-                dx, dy = -dy, dx
+                guard = (x, y, -dy, dx)
+            elif 0 <= nx < width and 0 <= ny < height:
+                guard = (nx, ny, dx, dy)
             else:
-                x = nx
-                y = ny
-        return visited
+                return visited
+        return None
 
     visited = {(x, y) for x, y, dx, dy in simulate(obstacles)}
     print(f"part 1: {len(visited)}")
