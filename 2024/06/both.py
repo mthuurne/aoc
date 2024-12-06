@@ -23,28 +23,15 @@ def solve(obstacles, start):
     width = max(x + 1 for x, y in obstacles)
     height = max(y + 1 for x, y in obstacles)
 
-    x, y = start
-    dx, dy = 0, -1
-    visited = set()
-    while 0 <= x < width and 0 <= y < height:
-        visited.add((x, y))
-        nx = x + dx
-        ny = y + dy
-        if (nx, ny) in obstacles:
-            dx, dy = -dy, dx
-        else:
-            x = nx
-            y = ny
-    print(f"part 1: {len(visited)}")
-
-    def would_loop(obstacles):
+    def simulate(obstacles):
+        """Return positions visited, or None if guard loops."""
         x, y = start
         dx, dy = 0, -1
         visited = set()
         while 0 <= x < width and 0 <= y < height:
             guard = (x, y, dx, dy)
             if guard in visited:
-                return True
+                return None
             visited.add(guard)
             nx = x + dx
             ny = y + dy
@@ -53,10 +40,13 @@ def solve(obstacles, start):
             else:
                 x = nx
                 y = ny
-        return False
+        return visited
+
+    visited = {(x, y) for x, y, dx, dy in simulate(obstacles)}
+    print(f"part 1: {len(visited)}")
 
     num_options = sum(
-        would_loop(obstacles | {new_obstacle})
+        simulate(obstacles | {new_obstacle}) is None
         for new_obstacle in visited - {start}
     )
     print(f"part 2: {num_options}")
