@@ -25,7 +25,7 @@ fn read_input(path: &Path) -> io::Result<(HashSet<(usize, usize)>, (usize, usize
 }
 
 fn simulate(obstacles: &HashSet<(usize, usize)>, start: (usize, usize), size: (usize, usize)) -> Option<HashSet<(usize, usize, i64, i64)>> {
-    let mut visited = HashSet::new();
+    let mut visited = HashSet::with_capacity(size.0 * size.1);
     let mut guard = (start.0, start.1, 0, -1);
     while visited.insert(guard) {
         let (x, y, dx, dy) = guard;
