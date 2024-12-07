@@ -20,12 +20,9 @@ def can_match(target, values):
             # Our operators can only increase the total, so we can't match from here.
             return False
         value = values[idx]
-        return (
-            (total != 0 and rec(idx + 1, total * value))
-            or rec(idx + 1, total + value)
-        )
+        return rec(idx + 1, total * value) or rec(idx + 1, total + value)
 
-    return rec(0, 0)
+    return rec(1, values[0])
 
 
 def solve(equations):
