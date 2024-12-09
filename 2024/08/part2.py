@@ -25,7 +25,7 @@ def solve(width, height, antennas):
             x += dx
             y += dy
 
-    for locations  in antennas.values():
+    for locations in antennas.values():
         for (x1, y1), (x2, y2) in combinations(locations, 2):
             dx = x2 - x1
             dy = y2 - y1
