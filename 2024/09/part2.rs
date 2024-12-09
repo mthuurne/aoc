@@ -42,7 +42,8 @@ fn solve(mut files: Vec<(usize, u8)>, mut gaps: Vec<(usize, u8)>) {
     }
 
     let checksum: usize = files.iter().enumerate().map(|(file_id, (block_id, file_size))| {
-        let block_id_sum: usize = (*block_id..*block_id + *file_size as usize).sum(); block_id_sum * file_id
+        let fs = *file_size as usize;
+        (fs * block_id + (fs * (fs - 1) / 2)) * file_id
     }).sum();
     println!("{checksum}");
 }
