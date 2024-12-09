@@ -1,6 +1,4 @@
 import fileinput
-from bisect import bisect
-from operator import itemgetter
 
 
 def read_input():
@@ -31,24 +29,8 @@ def solve(files, gaps):
                 files[file_idx] = (to_block, file_size)
                 # Update destination gap.
                 gaps[gap_idx] = (to_block + file_size, gap_size - file_size)
-                # Update source gap.
-                new_gap_idx = bisect(gaps, from_block, key=itemgetter(0))
-                gaps.insert(new_gap_idx, (from_block, file_size))
-                if new_gap_idx != 0:
-                    prev_gap_block, prev_gap_size = gaps[new_gap_idx - 1]
-                    if prev_gap_block + prev_gap_size == from_block:
-                        # Merge with preceding gap.
-                        gaps[new_gap_idx - 1] = (prev_gap_block, prev_gap_size + file_size)
-                        del gaps[new_gap_idx]
-                        new_gap_idx -= 1
-                if new_gap_idx + 1 < len(gaps):
-                    next_gap_block, next_gap_size = gaps[new_gap_idx + 1]
-                    if next_gap_block == from_block + file_size:
-                        # Merge with following gap.
-                        gaps[new_gap_idx] = (
-                            gaps[new_gap_idx][0], gaps[new_gap_idx][1] + next_gap_size
-                        )
-                        del gaps[new_gap_idx + 1]
+                # We don't need to update the source gap, as we'll never use it:
+                # files are only moved to the left and we're processing files right-to-left.
                 break
 
     # print(files)
