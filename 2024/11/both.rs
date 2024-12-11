@@ -1,3 +1,4 @@
+use memoize::memoize;
 use std::{env, fs::File, io::{self, BufRead}, path::Path};
 
 fn read_input(path: &Path) -> io::Result<Vec<u64>> {
@@ -13,6 +14,7 @@ fn read_input(path: &Path) -> io::Result<Vec<u64>> {
     Ok(stones)
 }
 
+#[memoize]
 fn simulate(stone: u64, ticks: u32) -> u64 {
     if ticks == 0 {
         1
@@ -36,7 +38,7 @@ fn simulate(stone: u64, ticks: u32) -> u64 {
 
 fn solve(stones: Vec<u64>) {
     println!("after 25 blinks: {}", stones.iter().map(|&stone| simulate(stone, 25)).sum::<u64>());
-    //println!("after 75 blinks: {}", stones.iter().map(|&stone| simulate(stone, 75)).sum::<u64>());
+    println!("after 75 blinks: {}", stones.iter().map(|&stone| simulate(stone, 75)).sum::<u64>());
 }
 
 fn main() {
