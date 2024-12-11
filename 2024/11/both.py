@@ -1,4 +1,5 @@
 import fileinput
+from functools import cache
 
 
 def read_input():
@@ -7,6 +8,7 @@ def read_input():
             yield int(n)
 
 
+@cache
 def simulate(stone, ticks):
     if ticks == 0:
         return 1
@@ -25,8 +27,8 @@ def simulate(stone, ticks):
 
 
 def solve(stones):
-    num_stones = sum(simulate(stone, 25) for stone in stones)
-    print(num_stones)
+    print("after 25 blinks:", sum(simulate(stone, 25) for stone in stones))
+    print("after 75 blinks:", sum(simulate(stone, 75) for stone in stones))
 
 
 if __name__ == "__main__":
