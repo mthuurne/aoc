@@ -52,19 +52,19 @@ fn calc_perimeter(size: Plot, region: &HashSet<Plot>) -> usize {
     perimeter
 }
 
-fn count_sides(region: &HashSet<Plot>, borders: &Vec<Plot>) -> usize {
+fn count_sides(region: &HashSet<Plot>, borders: &mut impl Iterator<Item=Plot>) -> usize {
     let mut sides = 0;
-    let mut i = 0;
-    let num_borders = borders.len();
-    while i < num_borders {
+    let mut plot = borders.next();
+    while let Some((a, mut b)) = plot {
         sides += 1;
-        let inside = region.contains(&borders[i]);
-        let (a, mut b) = borders[i];
-        b += 1;
-        i += 1;
-        while i < num_borders && borders[i] == (a, b) && region.contains(&borders[i]) == inside {
-            b += 1;
-            i += 1;
+        let inside = region.contains(&(a, b));
+        loop {
+            plot = borders.next();
+            if plot.is_some_and(|p| p == (a, b + 1) && region.contains(&p) == inside) {
+                b += 1;
+            } else {
+                break;
+            }
         }
     }
     sides
@@ -77,8 +77,7 @@ fn calc_vertical_sides(region: &HashSet<Plot>) -> usize {
         *border_freqs.entry((x + 1, *y)).or_insert(0usize) += 1;
     }
     border_freqs.retain(|_, freq| *freq == 1);
-    let borders = border_freqs.into_keys().sorted().collect();
-    count_sides(region, &borders)
+    count_sides(region, &mut border_freqs.into_keys().sorted())
 }
 
 fn solve(garden: Garden) {
