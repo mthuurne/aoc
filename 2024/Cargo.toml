@@ -79,3 +79,7 @@ path = "10/both.rs"
 [[bin]]
 name = "day11"
 path = "11/both.rs"
+
+[[bin]]
+name = "day12"
+path = "12/both.rs"
