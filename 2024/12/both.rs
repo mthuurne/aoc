@@ -70,21 +70,15 @@ fn count_sides(region: &HashSet<Plot>, borders: &Vec<Plot>) -> usize {
     sides
 }
 
-fn calc_sides(region: &HashSet<Plot>) -> usize {
-    let mut hborder_freqs = HashMap::new();
-    let mut vborder_freqs = HashMap::new();
+fn calc_vertical_sides(region: &HashSet<Plot>) -> usize {
+    let mut border_freqs = HashMap::new();
     for (x, y) in region.iter() {
-        *hborder_freqs.entry((*x, *y)).or_insert(0usize) += 1;
-        *hborder_freqs.entry((*x, *y + 1)).or_insert(0usize) += 1;
-        *vborder_freqs.entry((*x, *y)).or_insert(0usize) += 1;
-        *vborder_freqs.entry((x + 1, *y)).or_insert(0usize) += 1;
+        *border_freqs.entry((*x, *y)).or_insert(0usize) += 1;
+        *border_freqs.entry((x + 1, *y)).or_insert(0usize) += 1;
     }
-    hborder_freqs.retain(|_, freq| *freq == 1);
-    vborder_freqs.retain(|_, freq| *freq == 1);
-    let hborders = hborder_freqs.iter().map(|((x, y), _)| (*y, *x)).sorted().collect();
-    let vborders = vborder_freqs.iter().map(|((x, y), _)| (*x, *y)).sorted().collect();
-    let flipped_region = HashSet::from_iter(region.iter().map(|(x, y)| (*y, *x)));
-    count_sides(&flipped_region, &hborders) + count_sides(region, &vborders)
+    border_freqs.retain(|_, freq| *freq == 1);
+    let borders = border_freqs.into_keys().sorted().collect();
+    count_sides(region, &borders)
 }
 
 fn solve(garden: Garden) {
@@ -100,7 +94,8 @@ fn solve(garden: Garden) {
                 let region = calc_region(&garden, size, plot);
                 let area = region.len();
                 let perimeter = calc_perimeter(size, &region);
-                let sides = calc_sides(&region);
+                let flipped_region = HashSet::from_iter(region.iter().map(|(x, y)| (*y, *x)));
+                let sides = calc_vertical_sides(&region) + calc_vertical_sides(&flipped_region);
                 total_cost1 += area * perimeter;
                 total_cost2 += area * sides;
                 done.extend(region.iter());
