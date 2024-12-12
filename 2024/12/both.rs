@@ -1,4 +1,6 @@
-use std::{collections::HashSet, env, fs::File, io::{self, BufRead}, path::Path};
+use std::{collections::{HashMap, HashSet}, env, fs::File, io::{self, BufRead}, path::Path};
+
+use itertools::Itertools;
 
 type Garden = Vec<Vec<char>>;
 type Plot = (usize, usize);
@@ -50,11 +52,47 @@ fn calc_perimeter(size: Plot, region: &HashSet<Plot>) -> usize {
     perimeter
 }
 
+fn count_sides(region: &HashSet<Plot>, borders: &Vec<Plot>) -> usize {
+    let mut sides = 0;
+    let mut i = 0;
+    let num_borders = borders.len();
+    while i < num_borders {
+        sides += 1;
+        let inside = region.contains(&borders[i]);
+        let (a, mut b) = borders[i];
+        b += 1;
+        i += 1;
+        while i < num_borders && borders[i] == (a, b) && region.contains(&borders[i]) == inside {
+            b += 1;
+            i += 1;
+        }
+    }
+    sides
+}
+
+fn calc_sides(region: &HashSet<Plot>) -> usize {
+    let mut hborder_freqs = HashMap::new();
+    let mut vborder_freqs = HashMap::new();
+    for (x, y) in region.iter() {
+        *hborder_freqs.entry((*x, *y)).or_insert(0usize) += 1;
+        *hborder_freqs.entry((*x, *y + 1)).or_insert(0usize) += 1;
+        *vborder_freqs.entry((*x, *y)).or_insert(0usize) += 1;
+        *vborder_freqs.entry((x + 1, *y)).or_insert(0usize) += 1;
+    }
+    hborder_freqs.retain(|_, freq| *freq == 1);
+    vborder_freqs.retain(|_, freq| *freq == 1);
+    let hborders = hborder_freqs.iter().map(|((x, y), _)| (*y, *x)).sorted().collect();
+    let vborders = vborder_freqs.iter().map(|((x, y), _)| (*x, *y)).sorted().collect();
+    let flipped_region = HashSet::from_iter(region.iter().map(|(x, y)| (*y, *x)));
+    count_sides(&flipped_region, &hborders) + count_sides(region, &vborders)
+}
+
 fn solve(garden: Garden) {
     let size = (garden[0].len(), garden.len());
 
     let mut done: HashSet<Plot> = HashSet::new();
-    let mut total_cost = 0;
+    let mut total_cost1 = 0;
+    let mut total_cost2 = 0;
     for y in 0..size.1 {
         for x in 0..size.0 {
             let plot = (x, y);
@@ -62,13 +100,15 @@ fn solve(garden: Garden) {
                 let region = calc_region(&garden, size, plot);
                 let area = region.len();
                 let perimeter = calc_perimeter(size, &region);
-                let cost = area * perimeter;
-                total_cost += cost;
+                let sides = calc_sides(&region);
+                total_cost1 += area * perimeter;
+                total_cost2 += area * sides;
                 done.extend(region.iter());
             }
         }
     }
-    println!("total cost: {total_cost}");
+    println!("part 1 total cost: {total_cost1}");
+    println!("part 2 total cost: {total_cost2}");
 }
 
 fn main() {
