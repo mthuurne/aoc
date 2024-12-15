@@ -32,7 +32,6 @@ def solve(machines):
         for na in range(min(prize[0] // ao[0], prize[1] // ao[1]) + 1):
             x = na * ao[0]
             y = na * ao[1]
-            dy = prize[0] - y
             nbx = (prize[0] - x) // bo[0]
             nby = (prize[1] - y) // bo[1]
             if nbx == nby and (x + bo[0] * nbx, y + bo[1] * nby) == prize:
