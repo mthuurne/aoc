@@ -110,23 +110,21 @@ def solve(reg, program):
 
     def search(idx, a_val):
         if idx == 0:
-            yield a_val
-        else:
-            idx -= 1
-            output = program[idx]
-            for v_new in range(8):
-                a_new = (a_val << 3) | v_new
-                if v_new == output ^ 3 ^ ((a_new >> (v_new ^ 5)) & 7):
-                    yield from search(idx, a_new)
+            return a_val
+        idx -= 1
+        output = program[idx]
+        for v_new in range(8):
+            a_new = (a_val << 3) | v_new
+            if v_new == output ^ 3 ^ ((a_new >> (v_new ^ 5)) & 7):
+                if (ret := search(idx, a_new)) is not None:
+                    return ret
+        return None
 
-    solutions = []
-    for a_val in search(len(program), 0):
-        print(a_val)
-        reg[0] = a_val
-        assert check(reg, program)
-        solutions.append(a_val)
-    print()
-    print(min(solutions))
+    a_val = search(len(program), 0)
+    print(a_val)
+    assert a_val is not None
+    reg[0] = a_val
+    assert check(reg, program)
 
 
 if __name__ == "__main__":
