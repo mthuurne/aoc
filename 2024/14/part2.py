@@ -21,7 +21,7 @@ def solve(robots):
     # The step contained in both convergence sequences is the solution.
     # For my input:
     #      set(72 + 101 * i for i in range(103))
-    #    & set(134 + 103 * i for i in range(101))
+    #    & set(31 + 103 * i for i in range(101))
     #   == {7344}
     for steps in range(width * height):
         grid = [[0] * width for _ in range(height)]
